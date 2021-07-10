@@ -81,6 +81,8 @@ async function scrapPAPTest(city) {
     nb_pages_toscrap_courbevoie = 20;
     url_toulouse = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-";
     nb_pages_toscrap_toulouse = 10;
+    url_paris = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-";
+    nb_pages_toscrap_paris = 20;
 
     if(city == "courbevoie"){
         city_to_scrap = url_courbevoie;
@@ -93,6 +95,10 @@ async function scrapPAPTest(city) {
     else if(city == "toulouse"){
         city_to_scrap = url_toulouse;
         nb_pages_city = nb_pages_toscrap_toulouse;
+    }
+    else if(city == "paris"){
+        city_to_scrap = url_paris;
+        nb_pages_city = nb_pages_toscrap_paris;
     }
 
     for (var x = 1; x <= nb_pages_city; x++) {
