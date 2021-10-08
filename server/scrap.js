@@ -72,32 +72,56 @@ async function scrapPAP() {
     }
 };
 
-async function scrapPAPTest(city) {
+async function scrapPAPTest(city, mode) {
     var list_links = [];
 
-    url_nantes = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-nantes-44-g43619-du-studio-au-5-pieces-";
-    nb_pages_toscrap_nantes = 4;
-    url_courbevoie = 'https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-courbevoie-92400-g43294-du-studio-au-5-pieces-';
-    nb_pages_toscrap_courbevoie = 20;
-    url_toulouse = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-";
-    nb_pages_toscrap_toulouse = 10;
-    url_paris = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-";
-    nb_pages_toscrap_paris = 20;
+    url_nantes_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-nantes-44-g43619-du-studio-au-5-pieces-";
+    url_nantes_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-nantes-44-g43619-du-studio-au-5-pieces-";
+    nb_pages_toscrap_nantes = 4; // 4
+    url_courbevoie_sell = 'https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-courbevoie-92400-g43294-du-studio-au-5-pieces-';
+    url_courbevoie_rent = 'https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-courbevoie-92400-g43294-du-studio-au-5-pieces-';
+    nb_pages_toscrap_courbevoie = 20; // 30
+    url_toulouse_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-";
+    url_toulouse_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-"
+    nb_pages_toscrap_toulouse = 10; // 10
+    url_paris_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-";
+    url_paris_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-"
+    nb_pages_toscrap_paris = 25; // 25
 
     if(city == "courbevoie"){
-        city_to_scrap = url_courbevoie;
+        if(mode == 'sell') {
+            city_to_scrap = url_courbevoie_sell;
+        }
+        else if(mode =='rent'){
+            city_to_scrap = url_courbevoie_rent;
+        }
         nb_pages_city = nb_pages_toscrap_courbevoie;
     }
     else if(city == "nantes"){
-        city_to_scrap = url_nantes;
+        if(mode == 'sell') {
+            city_to_scrap = url_nantes_sell;
+        }
+        else if(mode =='rent'){
+            city_to_scrap = url_nantes_rent;
+        }
         nb_pages_city = nb_pages_toscrap_nantes;
     }
     else if(city == "toulouse"){
-        city_to_scrap = url_toulouse;
+        if(mode == 'sell') {
+            city_to_scrap = url_toulouse_sell;
+        }
+        else if(mode =='rent'){
+            city_to_scrap = url_toulouse_rent;
+        }
         nb_pages_city = nb_pages_toscrap_toulouse;
     }
     else if(city == "paris"){
-        city_to_scrap = url_paris;
+        if(mode == 'sell') {
+            city_to_scrap = url_paris_sell;
+        }
+        else if(mode =='rent'){
+            city_to_scrap = url_paris_rent;
+        }
         nb_pages_city = nb_pages_toscrap_paris;
     }
 
@@ -127,7 +151,13 @@ async function scrapPAPTest(city) {
 
             const offers = {};
 
-            offers.title = $('h1.item-title').text().replace(/\s\s+/g, ' ').trim(); 
+            offers.title = $('h1.item-title').text().replace(/\s\s+/g, ' ').trim();
+            if(mode == 'sell') {
+                offers.type = 'sell';
+            }
+            else if(mode =='rent'){
+                offers.type = 'rent';
+            } 
             offers.link = list_links[i];
             offers.price = $('span.item-price').text().replace(/\s\s+/g, ' ').trim();
             offers.ref_n_date = $('p.item-date').text().replace(/\s\s+/g, ' ').trim();
@@ -147,21 +177,69 @@ async function scrapPAPTest(city) {
 };
 
 prompt.start();
-prompt.get(['City'], function (err, result) {
+prompt.get(['City', 'Mode'], function (err, result) {
     if (err) { return onErr(err); }
     else if (result.City.toLowerCase() == "toulouse") {
         console.log('  Scrapping Toulouse');
-        scrapPAPTest("toulouse");
+        if (result.Mode.toLowerCase() == "rent") {
+            scrapPAPTest("toulouse", "rent");
+        }
+        else if (result.Mode.toLowerCase() == "sell") {
+            scrapPAPTest("toulouse", "sell");
+        }
+        else {
+            console.log('Please enter a valid selection (rent, sell)');
+        }
+        
     }
     else if (result.City.toLowerCase() == "nantes") {
         console.log('  Scrapping Nantes');
-        scrapPAPTest("nantes");
+        if (result.Mode.toLowerCase() == "rent") {
+            scrapPAPTest("nantes", "rent");
+        }
+        else if (result.Mode.toLowerCase() == "sell") {
+            scrapPAPTest("nantes", "sell");
+        }
+        else {
+            console.log('Please enter a valid selection (rent, sell)');
+        }
     }
     else if (result.City.toLowerCase() == "courbevoie") {
         console.log('  Scrapping Courbevoie');
-        scrapPAPTest("courbevoie");
+        if (result.Mode.toLowerCase() == "rent") {
+            scrapPAPTest("courbevoie", "rent");
+        }
+        else if (result.Mode.toLowerCase() == "sell") {
+            scrapPAPTest("courbevoie", "sell");
+        }
+        else {
+            console.log('Please enter a valid selection (rent, sell)');
+        }
+    }
+    else if (result.City.toLowerCase() == "paris") {
+        console.log('  Scrapping Paris');
+        if (result.Mode.toLowerCase() == "rent") {
+            scrapPAPTest("paris", "rent");
+        }
+        else if (result.Mode.toLowerCase() == "sell") {
+            scrapPAPTest("paris", "sell");
+        }
+        else {
+            console.log('Please enter a valid selection (rent, sell)');
+        }
+    }
+    else if (result.City.toLowerCase() == "all" && result.Mode.toLowerCase() == 'all') {
+        console.log('  Scrapping All cities available');
+        scrapPAPTest("paris", 'rent');
+        scrapPAPTest("paris", 'sell');
+        scrapPAPTest("courbevoie", 'rent');
+        scrapPAPTest("courbevoie", 'sell');
+        scrapPAPTest("nantes", 'rent');
+        scrapPAPTest("nantes", 'sell');
+        scrapPAPTest("toulouse", 'rent');
+        scrapPAPTest("toulouse", 'sell');
     }
     else {
-        console.log('  Please enter a valid city (Toulouse, Nantes, Courbevoie)');
+        console.log('  Please enter a valid city (Toulouse, Nantes, Courbevoie ou Paris)');
     }
 });

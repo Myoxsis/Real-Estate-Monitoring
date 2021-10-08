@@ -7,6 +7,7 @@ const sequelize = new Sequelize('postgres://maxime_alain:www.myoxsis.com@localho
 class Scrap extends Model {}
 Scrap.init({
     title: { type: DataTypes.STRING, },
+    type: { type: DataTypes.STRING, },
     link: { type: DataTypes.STRING, },
     price: { type: DataTypes.STRING, },
     ref_n_date: { type: DataTypes.STRING, },
@@ -22,7 +23,7 @@ Scrap.init({
 });
 
 function createScrap(x) {
-    Scrap.create({ title : x.title, link : x.link, price : x.price, ref_n_date : x.ref_n_date,
+    Scrap.create({ title : x.title, type : x.type, link : x.link, price : x.price, ref_n_date : x.ref_n_date,
          city : x.city, tags : x.tags, free_text : x.free_text, transport : x.transport, raw_loc : x.raw_loc,
     }).then( offer => {
     console.log("Offer Generate ID", offer.id);
@@ -30,7 +31,7 @@ function createScrap(x) {
 }
 
 function isIdUnique (x) {
-    return Scrap.count({ where: { title : x.title, link : x.link, price : x.price, ref_n_date : x.ref_n_date,
+    return Scrap.count({ where: { title : x.title, type : x.type, link : x.link, price : x.price, ref_n_date : x.ref_n_date,
         city : x.city, tags : x.tags, free_text : x.free_text, transport : x.transport, raw_loc : x.raw_loc,  } })
       .then(count => {
         if (count != 0) {
