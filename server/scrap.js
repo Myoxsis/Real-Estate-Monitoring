@@ -74,19 +74,20 @@ async function scrapPAP() {
 
 async function scrapPAPTest(city, mode) {
     var list_links = [];
+    var ult_links = [];
 
     url_nantes_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-nantes-44-g43619-du-studio-au-5-pieces-";
     url_nantes_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-nantes-44-g43619-du-studio-au-5-pieces-";
-    nb_pages_toscrap_nantes = 4; // 4
+    nb_pages_toscrap_nantes = 4; // Standard : 4
     url_courbevoie_sell = 'https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-courbevoie-92400-g43294-du-studio-au-5-pieces-';
     url_courbevoie_rent = 'https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-courbevoie-92400-g43294-du-studio-au-5-pieces-';
-    nb_pages_toscrap_courbevoie = 20; // 30
+    nb_pages_toscrap_courbevoie = 30; // Standard : 30
     url_toulouse_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-";
     url_toulouse_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-toulouse-31-g43612-du-studio-au-5-pieces-"
-    nb_pages_toscrap_toulouse = 10; // 10
+    nb_pages_toscrap_toulouse = 10; // Standard : 10
     url_paris_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-";
     url_paris_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-"
-    nb_pages_toscrap_paris = 25; // 25
+    nb_pages_toscrap_paris = 25; // Standard : 25
 
     if(city == "courbevoie"){
         if(mode == 'sell') {
@@ -139,14 +140,31 @@ async function scrapPAPTest(city, mode) {
         console.log('Scrapping Page ' + x);
         sleep(getRandomInt(4,10)*1000);
     }
-
     console.log("Number of Links : " + list_links.length);
     console.log(list_links);
+    console.log('//////////////')
 
-    for (var i = 0; i < list_links.length; i++) {
+    console.log('Starting Links Rationalization');
+
+    
+    for (var x = 0; x <= list_links.length-1; x++) {
+        var analysed_link = list_links[x];
+        var r = await idx.uniqueLink(analysed_link);
+        if (r == false) {
+            //console.log('Already exists in database');
+        }
+        else {
+            //console.log("Non Existing");
+            ult_links.push(analysed_link);
+        }
+    };
+
+    console.log(ult_links);
+
+    for (var i = 0; i < ult_links.length; i++) {
         try{
-            console.log(list_links[i]);
-            const { data } = await axios.get(list_links[i]);
+            console.log(ult_links[i]);
+            const { data } = await axios.get(ult_links[i]);
             const $ = cheerio.load(data);
 
             const offers = {};
@@ -158,7 +176,7 @@ async function scrapPAPTest(city, mode) {
             else if(mode =='rent'){
                 offers.type = 'rent';
             } 
-            offers.link = list_links[i];
+            offers.link = ult_links[i];
             offers.price = $('span.item-price').text().replace(/\s\s+/g, ' ').trim();
             offers.ref_n_date = $('p.item-date').text().replace(/\s\s+/g, ' ').trim();
             offers.city = $('h2.margin-bottom-8').text().replace(/\s\s+/g, ' ').trim();
@@ -173,7 +191,8 @@ async function scrapPAPTest(city, mode) {
             console.log(e.message);
         }
         sleep(getRandomInt(4,10)*1000);
-    };
+        
+    }; 
 };
 
 prompt.start();
@@ -230,14 +249,26 @@ prompt.get(['City', 'Mode'], function (err, result) {
     }
     else if (result.City.toLowerCase() == "all" && result.Mode.toLowerCase() == 'all') {
         console.log('  Scrapping All cities available');
-        scrapPAPTest("paris", 'rent');
-        scrapPAPTest("paris", 'sell');
-        scrapPAPTest("courbevoie", 'rent');
-        scrapPAPTest("courbevoie", 'sell');
-        scrapPAPTest("nantes", 'rent');
-        scrapPAPTest("nantes", 'sell');
-        scrapPAPTest("toulouse", 'rent');
-        scrapPAPTest("toulouse", 'sell');
+        async function scrapPAPAll() {
+            console.log('Scrapping Paris [Rent]')
+            await scrapPAPTest("paris", 'rent');
+            console.log('Scrapping Paris [Sell]')
+            await scrapPAPTest("paris", 'sell');
+            console.log('Scrapping Courbevoie [Rent]')
+            await scrapPAPTest("courbevoie", 'rent');
+            console.log('Scrapping Courbevoie [Sell]')
+            await scrapPAPTest("courbevoie", 'sell');
+            console.log('Scrapping Nantes [Rent]')
+            await scrapPAPTest("nantes", 'rent');
+            console.log('Scrapping Nantes [Sell]')
+            await scrapPAPTest("nantes", 'sell');
+            console.log('Scrapping Toulouse [Rent]')
+            await scrapPAPTest("toulouse", 'rent');
+            console.log('Scrapping Toulouse [Sell]')
+            await scrapPAPTest("toulouse", 'sell');
+        }
+
+        scrapPAPAll();
     }
     else {
         console.log('  Please enter a valid city (Toulouse, Nantes, Courbevoie ou Paris)');

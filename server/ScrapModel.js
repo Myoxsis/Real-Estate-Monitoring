@@ -41,6 +41,16 @@ function isIdUnique (x) {
     });
 }
 
+function uniqueLink (x) {
+    return Scrap.count({ where: { link : x } })
+      .then(count => {
+        if (count != 0) {
+          return false;
+        }
+        return true;
+    });
+}
+
 function add_to_db(x) {
     isIdUnique(x)
         .then(isUnique => {
@@ -80,4 +90,4 @@ function getUpdateDateArray(day, now) {
 // the defined model is the class itself
 console.log(Scrap === sequelize.models.scrap);
 
-module.exports = { createScrap, isIdUnique, resetDatabase, add_to_db, getDB, getTodayOffers, getUpdateDateArray };
+module.exports = { createScrap, isIdUnique, resetDatabase, add_to_db, getDB, getTodayOffers, getUpdateDateArray, uniqueLink };
