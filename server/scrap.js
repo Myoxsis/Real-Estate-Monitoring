@@ -87,7 +87,7 @@ async function scrapPAPTest(city, mode) {
     nb_pages_toscrap_toulouse = 10; // Standard : 10
     url_paris_sell = "https://www.pap.fr/annonce/vente-appartement-immeuble-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-";
     url_paris_rent = "https://www.pap.fr/annonce/location-appartement-maison-residence-avec-service-paris-75-g439-du-studio-au-5-pieces-"
-    nb_pages_toscrap_paris = 25; // Standard : 25
+    nb_pages_toscrap_paris = 30; // Standard : 25
 
     if(city == "courbevoie"){
         if(mode == 'sell') {
